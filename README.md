@@ -2,6 +2,8 @@
 
 _Follow up: https://github.com/stevenlovegrove/Pangolin/issues/884_
 
+_Latest: The issue is resolved by updating libtorch to version [`2.1.0.dev20230724+cu118`](https://download.pytorch.org/libtorch/nightly/cu118/libtorch-cxx11-abi-shared-with-deps-latest.zip), and hopefully will be resolved in new release of pytorch > 2.0.1_
+
 Pangolin (https://github.com/stevenlovegrove/Pangolin) is a popular GUI for SLAM system, and libtorch is the C++ library of pytorch, used for deep learning.
 
 The current trend is to apply deep learning to SLAM system, hence it would be great that Pangolin and libtorch work well together. However, the [current version of Pangolin](https://github.com/stevenlovegrove/Pangolin) (commit: June 7, 2023 [d484494](https://github.com/stevenlovegrove/Pangolin/commit/d484494645cb7361374ac0ef6b27e9ee6feffbd7)) and [libtorch 2.0.1](https://download.pytorch.org/libtorch/cu117/libtorch-cxx11-abi-shared-with-deps-2.0.1%2Bcu117.zip) seem to be inconsistent at runtime. After compiling an application with Pangolin and libtorchk, a rare segmentation fault is issued when calling `pangolin::CreateWindowAndBind`. The detailed backtrace is:
