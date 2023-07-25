@@ -81,3 +81,32 @@ OpenGL ES profile version string: OpenGL ES 3.2 Mesa 21.2.6
 OpenGL ES profile shading language version string: OpenGL ES GLSL ES 3.20
 OpenGL ES profile extensions:
 ```
+
+## Further study
+
+Since the above error is related to GLX, I tried a branch of Pangolin which [replaced GLX by EGL](https://github.com/stevenlovegrove/Pangolin/pull/389).
+* __This branch can compile and the example HelloPangolin works well.__
+* The example `pangolin_libtorch_test` gives
+```
+Thread 1 "pangolin_libtor" received signal SIGSEGV, Segmentation fault.
+__GI___libc_free (mem=0x1) at malloc.c:3102
+3102    malloc.c: No such file or directory.
+(gdb) bt
+#0  __GI___libc_free (mem=0x1) at malloc.c:3102
+#1  0x00007f65aeadee69 in llvm::cl::Option::~Option() () from /workspace/build/_deps/torch-src/lib/libtorch_cpu.so
+#2  0x00007f6562f8ffde in __cxa_finalize (d=0x7f65c08ec000) at cxa_finalize.c:83
+#3  0x00007f65aa4c9d33 in __do_global_dtors_aux () from /workspace/build/_deps/torch-src/lib/libtorch_cpu.so
+#4  0x00007ffec316a970 in ?? ()
+#5  0x00007f65c92d3f6b in _dl_fini () at dl-fini.c:138
+Backtrace stopped: frame did not save the PC
+```
+Clearly this error is on Pytorch's side.  Both messages point to LLVM, indicating a symbol conflict.
+
+After googling this message, more information is found:
+* Qt + libtorch: https://github.com/pytorch/pytorch/issues/103756
+* Valkun + libtorch: https://github.com/pytorch/pytorch/issues/102533
+* SDL + libtorch: https://github.com/pytorch/pytorch/issues/71283
+
+Moreover, I find that `opengl_libtorch_test` also generates the same segfault (since the message is different from the previous one, I just ignored it yesterday).
+
+In https://github.com/pytorch/pytorch/issues/103756, a patch is provided just two weeks ago (https://github.com/pytorch/builder/pull/1445). So I tried the nightly built version [`2.1.0.dev20230724+cu118`](https://download.pytorch.org/libtorch/nightly/cu118/libtorch-cxx11-abi-shared-with-deps-latest.zip) (accessed on July 25, 2023), and found that it works for both Pangolin & OpenGL, and all above issues are gone.
